@@ -1,0 +1,126 @@
+// Copyright 2017 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+#include "third_party/blink/renderer/core/layout/ng/inline/ng_line_box_fragment_builder.h"
+
+#include "third_party/blink/renderer/core/layout/ng/exclusions/ng_exclusion_space.h"
+#include "third_party/blink/renderer/core/layout/ng/inline/ng_inline_break_token.h"
+#include "third_party/blink/renderer/core/layout/ng/inline/ng_inline_node.h"
+#include "third_party/blink/renderer/core/layout/ng/inline/ng_physical_line_box_fragment.h"
+#include "third_party/blink/renderer/core/layout/ng/ng_fragment.h"
+#include "third_party/blink/renderer/core/layout/ng/ng_layout_result.h"
+#include "third_party/blink/renderer/core/layout/ng/ng_positioned_float.h"
+
+namespace blink {
+
+NGLineBoxFragmentBuilder::NGLineBoxFragmentBuilder(
+    NGInlineNode node,
+    scoped_refptr<const ComputedStyle> style,
+    WritingMode writing_mode,
+    TextDirection)
+    : NGContainerFragmentBuilder(style, writing_mode, TextDirection::kLtr),
+      node_(node),
+      base_direction_(TextDirection::kLtr) {}
+
+NGLineBoxFragmentBuilder::~NGLineBoxFragmentBuilder() = default;
+
+void NGLineBoxFragmentBuilder::Reset() {
+  children_.resize(0);
+  offsets_.resize(0);
+  metrics_ = NGLineHeightMetrics();
+  size_.inline_size = LayoutUnit();
+}
+
+NGLineBoxFragmentBuilder::Child*
+NGLineBoxFragmentBuilder::ChildList::FirstInFlowChild() {
+  for (auto& child : *this) {
+    if (child.HasInFlowFragment())
+      return &child;
+  }
+  return nullptr;
+}
+
+NGLineBoxFragmentBuilder::Child*
+NGLineBoxFragmentBuilder::ChildList::LastInFlowChild() {
+  for (auto it = rbegin(); it != rend(); it++) {
+    auto& child = *it;
+    if (child.HasInFlowFragment())
+      return &child;
+  }
+  return nullptr;
+}
+
+void NGLineBoxFragmentBuilder::ChildList::MoveInInlineDirection(
+    LayoutUnit delta,
+    unsigned start,
+    unsigned end) {
+  for (unsigned index = start; index < end; index++)
+    children_[index].offset.inline_offset += delta;
+}
+
+void NGLineBoxFragmentBuilder::ChildList::MoveInBlockDirection(
+    LayoutUnit delta) {
+  for (auto& child : children_)
+    child.offset.block_offset += delta;
+}
+
+void NGLineBoxFragmentBuilder::ChildList::MoveInBlockDirection(LayoutUnit delta,
+                                                               unsigned start,
+                                                               unsigned end) {
+  for (unsigned index = start; index < end; index++)
+    children_[index].offset.block_offset += delta;
+}
+
+void NGLineBoxFragmentBuilder::AddChildren(ChildList& children) {
+  offsets_.ReserveCapacity(children.size());
+  children_.ReserveCapacity(children.size());
+
+  for (auto& child : children) {
+    if (child.layout_result) {
+      DCHECK(!child.fragment);
+      AddChild(*child.layout_result, child.offset);
+      child.layout_result.reset();
+    } else if (child.fragment) {
+      AddChild(std::move(child.fragment), child.offset);
+      DCHECK(!child.fragment);
+    }
+  }
+}
+
+scoped_refptr<NGLayoutResult> NGLineBoxFragmentBuilder::ToLineBoxFragment() {
+  WritingMode line_writing_mode(ToLineWritingMode(GetWritingMode()));
+  NGPhysicalSize physical_size = Size().ConvertToPhysical(line_writing_mode);
+
+  Vector<NGLink> children;
+  if (!children_.IsEmpty())
+    children.ReserveInitialCapacity(children_.size());
+
+  DCHECK_EQ(children_.size(), offsets_.size());
+  for (wtf_size_t i = 0; i < children_.size(); i++) {
+    auto& child = children_[i];
+    children.emplace_back(
+        std::move(children_[i]),
+        offsets_[i].ConvertToPhysical(line_writing_mode, Direction(),
+                                      physical_size, child->Size()));
+  }
+
+  scoped_refptr<const NGPhysicalLineBoxFragment> fragment =
+      base::AdoptRef(new NGPhysicalLineBoxFragment(
+          Style(), style_variant_, physical_size, children, metrics_,
+          base_direction_,
+          break_token_ ? std::move(break_token_)
+                       : NGInlineBreakToken::Create(node_)));
+
+  return base::AdoptRef(new NGLayoutResult(
+      std::move(fragment), std::move(oof_positioned_descendants_),
+      std::move(positioned_floats_), unpositioned_list_marker_,
+      std::move(exclusion_space_), bfc_line_offset_, bfc_block_offset_,
+      end_margin_strut_,
+      /* intrinsic_block_size */ LayoutUnit(),
+      /* minimal_space_shortage */ LayoutUnit::Max(), EBreakBetween::kAuto,
+      EBreakBetween::kAuto, /* has_forced_break */ false, is_pushed_by_floats_,
+      adjoining_floats_, NGLayoutResult::kSuccess));
+}
+
+}  // namespace blink

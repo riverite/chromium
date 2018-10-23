@@ -1,0 +1,11 @@
+Name: Feed
+Short name: feed
+URL: https://chromium.googlesource.com/feed
+Version: 0
+Revision: 4c2bad2ee503d3b26530299606bc6156247129e2
+License: Apache 2.0
+License File: LICENSE
+Security Critical: yes
+License Android Compatible: yes
+Description: Feed is a library for embedding content recommendations.
+Local Modifications: None
