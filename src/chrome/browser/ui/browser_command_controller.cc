@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
+
 #include "chrome/browser/ui/browser_command_controller.h"
 
 #include <stddef.h>
@@ -222,7 +226,18 @@ bool BrowserCommandController::IsReservedCommandOrKey(
   if (delegate && event.os_event && delegate->MatchEvent(*event.os_event, NULL))
     return false;
 #endif
-
+#if BUILD_INCOGNITO_TAB
+  return command_id == IDC_CLOSE_TAB ||
+         command_id == IDC_CLOSE_WINDOW ||
+         command_id == IDC_NEW_INCOGNITO_WINDOW ||
+         command_id == IDC_NEW_INCOGNITO_TAB ||
+         command_id == IDC_NEW_TAB ||
+         command_id == IDC_NEW_WINDOW ||
+         command_id == IDC_RESTORE_TAB ||
+         command_id == IDC_SELECT_NEXT_TAB ||
+         command_id == IDC_SELECT_PREVIOUS_TAB ||
+         command_id == IDC_EXIT;
+#else
   return command_id == IDC_CLOSE_TAB ||
          command_id == IDC_CLOSE_WINDOW ||
          command_id == IDC_NEW_INCOGNITO_WINDOW ||
@@ -232,6 +247,7 @@ bool BrowserCommandController::IsReservedCommandOrKey(
          command_id == IDC_SELECT_NEXT_TAB ||
          command_id == IDC_SELECT_PREVIOUS_TAB ||
          command_id == IDC_EXIT;
+#endif
 }
 
 void BrowserCommandController::TabStateChanged() {
@@ -362,6 +378,22 @@ bool BrowserCommandController::ExecuteCommandWithDisposition(
 #endif
       break;
     }
+#if BUILD_INCOGNITO_TAB
+    case IDC_NEW_INCOGNITO_TAB: {
+      NewIncognitoTab(browser_);
+#if BUILDFLAG(ENABLE_DESKTOP_IN_PRODUCT_HELP)
+      // This is not in NewTab() to avoid tracking programmatic creation of new
+      // tabs by extensions.
+      auto* new_tab_tracker =
+          feature_engagement::NewTabTrackerFactory::GetInstance()
+              ->GetForProfile(profile());
+
+      new_tab_tracker->OnNewTabOpened();
+      new_tab_tracker->CloseBubble();
+#endif
+      break;
+    }
+#endif
     case IDC_CLOSE_TAB:
       base::RecordAction(base::UserMetricsAction("CloseTabByKey"));
       CloseTab(browser_);
@@ -841,6 +873,9 @@ void BrowserCommandController::InitCommandState() {
   // Window management commands
   command_updater_.UpdateCommandEnabled(IDC_CLOSE_WINDOW, true);
   command_updater_.UpdateCommandEnabled(IDC_NEW_TAB, true);
+#if BUILD_INCOGNITO_TAB
+  command_updater_.UpdateCommandEnabled(IDC_NEW_INCOGNITO_TAB, true);
+#endif
   command_updater_.UpdateCommandEnabled(IDC_CLOSE_TAB, true);
   command_updater_.UpdateCommandEnabled(IDC_DUPLICATE_TAB, true);
   UpdateTabRestoreCommandState();

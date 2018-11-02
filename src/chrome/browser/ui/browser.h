@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
+
 #ifndef CHROME_BROWSER_UI_BROWSER_H_
 #define CHROME_BROWSER_UI_BROWSER_H_
 
@@ -250,6 +254,9 @@ class Browser : public TabStripModelObserver,
   const std::string& app_name() const { return app_name_; }
   bool is_trusted_source() const { return is_trusted_source_; }
   Profile* profile() const { return profile_; }
+#if BUILD_INCOGNITO_TAB
+  void SetProfile(Profile* profile) { profile_ = profile; }
+#endif
   gfx::Rect override_bounds() const { return override_bounds_; }
   const std::string& initial_workspace() const { return initial_workspace_; }
 
@@ -910,7 +917,11 @@ class Browser : public TabStripModelObserver,
   const Type type_;
 
   // This Browser's profile.
+  #if BUILD_INCOGNITO_TAB
+  Profile* profile_;
+  #else
   Profile* const profile_;
+  #endif
 
   // This Browser's window.
   BrowserWindow* window_;

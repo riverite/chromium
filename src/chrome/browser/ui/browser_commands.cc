@@ -1,6 +1,9 @@
 // Copyright 2012 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
 
 #include "chrome/browser/ui/browser_commands.h"
 
@@ -598,7 +601,9 @@ void NewTab(Browser* browser) {
   // user-initiated commands.
   UMA_HISTOGRAM_ENUMERATION("Tab.NewTab", TabStripModel::NEW_TAB_COMMAND,
                             TabStripModel::NEW_TAB_ENUM_COUNT);
-
+#if BUILD_INCOGNITO_TAB
+  browser->SetProfile(browser->profile()->GetOriginalProfile());
+#endif
   if (browser->is_type_tabbed()) {
     AddTabAt(browser, GURL(), -1, true);
     browser->tab_strip_model()->GetActiveWebContents()->RestoreFocus();
@@ -613,6 +618,31 @@ void NewTab(Browser* browser) {
     b->tab_strip_model()->GetActiveWebContents()->RestoreFocus();
   }
 }
+
+#if BUILD_INCOGNITO_TAB
+void NewIncognitoTab(Browser* browser) {
+  base::RecordAction(UserMetricsAction("NewTab"));
+  // TODO(asvitkine): This is invoked programmatically from several places.
+  // Audit the code and change it so that the histogram only gets collected for
+  // user-initiated commands.
+  UMA_HISTOGRAM_ENUMERATION("Tab.NewTab", TabStripModel::NEW_TAB_COMMAND,
+                            TabStripModel::NEW_TAB_ENUM_COUNT);
+  browser->SetProfile(browser->profile()->GetOffTheRecordProfile());
+  if (browser->is_type_tabbed()) {
+    AddTabAt(browser, GURL(), -1, true);
+    browser->tab_strip_model()->GetActiveWebContents()->RestoreFocus();
+  } else {
+    ScopedTabbedBrowserDisplayer displayer(browser->profile());
+    Browser* b = displayer.browser();
+    AddTabAt(b, GURL(), -1, true);
+    b->window()->Show();
+    // The call to AddBlankTabAt above did not set the focus to the tab as its
+    // window was not active, so we have to do it explicitly.
+    // See http://crbug.com/6380.
+    b->tab_strip_model()->GetActiveWebContents()->RestoreFocus();
+  }
+}
+#endif
 
 void CloseTab(Browser* browser) {
   base::RecordAction(UserMetricsAction("CloseTab_Accelerator"));

@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
+
 #ifndef CHROME_APP_CHROME_COMMAND_IDS_H_
 #define CHROME_APP_CHROME_COMMAND_IDS_H_
 
@@ -31,6 +35,9 @@
 // Window management commands
 #define IDC_NEW_WINDOW                  34000
 #define IDC_NEW_INCOGNITO_WINDOW        34001
+#if BUILD_INCOGNITO_TAB
+#define IDC_NEW_INCOGNITO_TAB           34002
+#endif
 #define IDC_PIN_TO_START_SCREEN         34005
 #define IDC_CLOSE_WINDOW                34012
 #define IDC_ALWAYS_ON_TOP               34013

@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
+
 #ifndef CHROME_BROWSER_UI_BROWSER_COMMANDS_H_
 #define CHROME_BROWSER_UI_BROWSER_COMMANDS_H_
 
@@ -73,6 +77,9 @@ void NewWindow(Browser* browser);
 void NewIncognitoWindow(Profile* profile);
 void CloseWindow(Browser* browser);
 void NewTab(Browser* browser);
+#if BUILD_INCOGNITO_TAB
+void NewIncognitoTab(Browser* browser);
+#endif
 void CloseTab(Browser* browser);
 bool CanZoomIn(content::WebContents* contents);
 bool CanZoomOut(content::WebContents* contents);

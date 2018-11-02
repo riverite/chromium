@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
+
 #include "chrome/browser/resource_coordinator/tab_activity_watcher.h"
 
 #include "base/metrics/histogram_macros.h"
@@ -143,7 +147,9 @@ class TabActivityWatcher::WebContentsData
 
   explicit WebContentsData(content::WebContents* web_contents)
       : WebContentsObserver(web_contents) {
+#if !BUILD_INCOGNITO_TAB
     DCHECK(!web_contents->GetBrowserContext()->IsOffTheRecord());
+#endif
     tab_metrics_.web_contents = web_contents;
     web_contents->GetRenderViewHost()->GetWidget()->AddInputEventObserver(this);
 
