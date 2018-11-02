@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
+
 #include "chrome/browser/ui/views/frame/system_menu_model_builder.h"
 
 #include "base/command_line.h"
@@ -84,6 +88,9 @@ void SystemMenuModelBuilder::BuildSystemMenuForBrowserWindow(
   model->AddSeparator(ui::NORMAL_SEPARATOR);
 #endif
   model->AddItemWithStringId(IDC_NEW_TAB, IDS_NEW_TAB);
+#if BUILD_INCOGNITO_TAB
+  model->AddItemWithStringId(IDC_NEW_INCOGNITO_TAB, IDS_NEW_INCOGNITO_TAB);
+#endif
   model->AddItemWithStringId(IDC_RESTORE_TAB, IDS_RESTORE_TAB);
   if (chrome::CanOpenTaskManager()) {
     model->AddSeparator(ui::NORMAL_SEPARATOR);

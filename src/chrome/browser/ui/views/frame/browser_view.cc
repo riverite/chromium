@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
+
 #include "chrome/browser/ui/views/frame/browser_view.h"
 
 #include <stdint.h>
@@ -2769,6 +2773,9 @@ int BrowserView::GetCommandIDForAppCommandID(int app_command_id) const {
     case APPCOMMAND_BROWSER_SEARCH:   return IDC_FOCUS_SEARCH;
     case APPCOMMAND_HELP:             return IDC_HELP_PAGE_VIA_KEYBOARD;
     case APPCOMMAND_NEW:              return IDC_NEW_TAB;
+#if BUILD_INCOGNITO_TAB
+    case APPCOMMAND_NEW_INCOGNITO:    return IDC_NEW_INCOGNITO_TAB;
+#endif
     case APPCOMMAND_OPEN:             return IDC_OPEN_FILE;
     case APPCOMMAND_CLOSE:            return IDC_CLOSE_TAB;
     case APPCOMMAND_SAVE:             return IDC_SAVE_PAGE;

@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
+
 #ifndef CHROME_BROWSER_UI_TOOLBAR_APP_MENU_MODEL_H_
 #define CHROME_BROWSER_UI_TOOLBAR_APP_MENU_MODEL_H_
 
@@ -39,6 +43,9 @@ enum AppMenuAction {
   MENU_ACTION_BOOKMARK_ALL_TABS = 7,
   MENU_ACTION_PIN_TO_START_SCREEN = 8,
   MENU_ACTION_RESTORE_TAB = 9,
+#if BUILD_INCOGNITO_TAB
+  MENU_ACTION_NEW_INCOGNITO_TAB = 10,
+#endif
   MENU_ACTION_DISTILL_PAGE = 13,
   MENU_ACTION_SAVE_PAGE = 14,
   MENU_ACTION_FIND = 15,

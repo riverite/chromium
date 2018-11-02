@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
+
 #include "chrome/browser/ui/views/frame/global_menu_bar_x11.h"
 
 #include <dlfcn.h>
@@ -147,6 +151,9 @@ const int TAG_PROFILES = 5;
 
 GlobalMenuBarCommand file_menu[] = {
   { IDS_NEW_TAB, IDC_NEW_TAB },
+#if BUILD_INCOGNITO_TAB
+  { IDS_NEW_INCOGNITO_TAB, IDC_NEW_INCOGNITO_TAB },
+#endif
   { IDS_NEW_WINDOW, IDC_NEW_WINDOW },
   { IDS_NEW_INCOGNITO_WINDOW, IDC_NEW_INCOGNITO_WINDOW },
   { IDS_REOPEN_CLOSED_TABS_LINUX, IDC_RESTORE_TAB },

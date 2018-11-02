@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
+
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 
 #include <algorithm>
@@ -943,6 +947,9 @@ bool TabStripModel::IsContextMenuCommandEnabled(
   DCHECK(command_id > CommandFirst && command_id < CommandLast);
   switch (command_id) {
     case CommandNewTab:
+  #if BUILD_INCOGNITO_TAB
+    case CommandNewIncognitoTab:
+  #endif
     case CommandCloseTab:
       return true;
 
@@ -1021,6 +1028,23 @@ void TabStripModel::ExecuteContextMenuCommand(int context_index,
 #endif
       break;
     }
+#if BUILD_INCOGNITO_TAB
+    case CommandNewIncognitoTab: {
+      base::RecordAction(UserMetricsAction("TabContextMenu_NewTab"));
+      UMA_HISTOGRAM_ENUMERATION("Tab.NewTab",
+                                TabStripModel::NEW_TAB_CONTEXT_MENU,
+                                TabStripModel::NEW_TAB_ENUM_COUNT);
+      delegate()->AddTabAt(GURL(), context_index + 1, true);
+#if BUILDFLAG(ENABLE_DESKTOP_IN_PRODUCT_HELP)
+      auto* new_tab_tracker =
+          feature_engagement::NewTabTrackerFactory::GetInstance()
+              ->GetForProfile(profile_);
+      new_tab_tracker->OnNewTabOpened();
+      new_tab_tracker->CloseBubble();
+#endif
+      break;
+    }
+#endif
 
     case CommandReload: {
       base::RecordAction(UserMetricsAction("TabContextMenu_Reload"));
@@ -1200,6 +1224,11 @@ bool TabStripModel::ContextMenuCommandToBrowserCommand(int cmd_id,
     case CommandNewTab:
       *browser_cmd = IDC_NEW_TAB;
       break;
+#if BUILD_INCOGNITO_TAB
+    case CommandNewIncognitoTab:
+      *browser_cmd = IDC_NEW_INCOGNITO_TAB;
+      break;
+#endif
     case CommandReload:
       *browser_cmd = IDC_RELOAD;
       break;

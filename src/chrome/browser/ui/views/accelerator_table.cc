@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
+
 #include "chrome/browser/ui/views/accelerator_table.h"
 
 #include <stddef.h>
@@ -160,9 +164,18 @@ const AcceleratorMapping kAcceleratorMap[] = {
     {ui::VKEY_N, ui::EF_SHIFT_DOWN | ui::EF_PLATFORM_ACCELERATOR,
      IDC_NEW_INCOGNITO_WINDOW},
     {ui::VKEY_T, ui::EF_PLATFORM_ACCELERATOR, IDC_NEW_TAB},
+#if BUILD_INCOGNITO_TAB
+    {ui::VKEY_T, ui::EF_SHIFT_DOWN | ui::EF_PLATFORM_ACCELERATOR,
+     IDC_NEW_INCOGNITO_TAB},
+#endif
     {ui::VKEY_N, ui::EF_PLATFORM_ACCELERATOR, IDC_NEW_WINDOW},
+#if BUILD_INCOGNITO_TAB
+    {ui::VKEY_T, ui::EF_ALT_DOWN | ui::EF_PLATFORM_ACCELERATOR,
+     IDC_RESTORE_TAB},
+#else
     {ui::VKEY_T, ui::EF_SHIFT_DOWN | ui::EF_PLATFORM_ACCELERATOR,
      IDC_RESTORE_TAB},
+#endif
 
     // Alt by itself (or with just shift) is never used on Mac since it's used
     // to generate non-ASCII characters. Such commands are given Mac-specific

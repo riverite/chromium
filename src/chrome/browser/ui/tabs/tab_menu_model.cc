@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
+
 #include "chrome/browser/ui/tabs/tab_menu_model.h"
 
 #include "base/command_line.h"
@@ -23,6 +27,9 @@ void TabMenuModel::Build(TabStripModel* tab_strip, int index) {
       (tab_strip->IsTabSelected(index) &&
        tab_strip->selection_model().selected_indices().size() > 1);
   AddItemWithStringId(TabStripModel::CommandNewTab, IDS_TAB_CXMENU_NEWTAB);
+#if BUILD_INCOGNITO_TAB
+  AddItemWithStringId(TabStripModel::CommandNewIncognitoTab, IDS_TAB_CXMENU_NEWINCOGNITOTAB);
+#endif
   AddSeparator(ui::NORMAL_SEPARATOR);
   AddItemWithStringId(TabStripModel::CommandReload, IDS_TAB_CXMENU_RELOAD);
   AddItemWithStringId(TabStripModel::CommandDuplicate,

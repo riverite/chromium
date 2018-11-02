@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
+
 #include "chrome/browser/ui/toolbar/app_menu_model.h"
 
 #include <algorithm>
@@ -326,6 +330,13 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
         UMA_HISTOGRAM_MEDIUM_TIMES("WrenchMenu.TimeToAction.NewTab", delta);
       LogMenuAction(MENU_ACTION_NEW_TAB);
       break;
+#if BUILD_INCOGNITO_TAB
+    case IDC_NEW_INCOGNITO_TAB:
+      if (!uma_action_recorded_)
+        UMA_HISTOGRAM_MEDIUM_TIMES("WrenchMenu.TimeToAction.NewIncognitoTab", delta);
+      LogMenuAction(MENU_ACTION_NEW_INCOGNITO_TAB);
+      break;
+#endif
     case IDC_NEW_WINDOW:
       if (!uma_action_recorded_)
         UMA_HISTOGRAM_MEDIUM_TIMES("WrenchMenu.TimeToAction.NewWindow", delta);
@@ -718,6 +729,9 @@ void AppMenuModel::Build() {
     AddSeparator(ui::NORMAL_SEPARATOR);
 
   AddItemWithStringId(IDC_NEW_TAB, IDS_NEW_TAB);
+  #if BUILD_INCOGNITO_TAB
+  AddItemWithStringId(IDC_NEW_INCOGNITO_TAB, IDS_NEW_INCOGNITO_TAB);
+  #endif
   AddItemWithStringId(IDC_NEW_WINDOW, IDS_NEW_WINDOW);
   if (ShouldShowNewIncognitoWindowMenuItem())
     AddItemWithStringId(IDC_NEW_INCOGNITO_WINDOW, IDS_NEW_INCOGNITO_WINDOW);

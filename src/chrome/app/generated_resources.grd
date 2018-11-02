@@ -822,6 +822,9 @@ are declared in tools/grit/grit_rule.gni.
           <message name="IDS_NEW_TAB" desc="The text label of a menu item for opening a new tab">
             New &amp;tab
           </message>
+          <message name="IDS_NEW_INCOGNITO_TAB" desc="The text label of a menu item for opening a new incognito tab">
+            New &amp;incognito tab
+          </message>
           <message name="IDS_SHOW_AS_TAB" desc="The text label for the Show As tab menu item">
             &amp;Show as tab
           </message>
@@ -892,6 +895,9 @@ are declared in tools/grit/grit_rule.gni.
         <if expr="use_titlecase">
           <message name="IDS_NEW_TAB" desc="In Title Case: The text label of a menu item for opening a new tab">
             New &amp;Tab
+          </message>
+          <message name="IDS_NEW_INCOGNITO_TAB" desc="In Title Case: The text label of a menu item for opening a new incognito tab">
+            New &amp;Incognito Tab
           </message>
           <message name="IDS_SHOW_AS_TAB" desc="In Title Case: The text label for the Show As tab menu item">
             &amp;Show As Tab
@@ -5625,6 +5631,9 @@ the Bookmarks menu.">
         <message name="IDS_TAB_CXMENU_NEWTAB" desc="The label of the 'New Tab' Tab context menu item.">
           New tab
         </message>
+        <message name="IDS_TAB_CXMENU_NEWINCOGNITOTAB" desc="The label of the 'New Incognito Tab' Tab context menu item.">
+          New Incognito tab
+        </message>
         <message name="IDS_TAB_CXMENU_RELOAD" desc="The label of the 'Reload' Tab context menu item.">
           Reload
         </message>
@@ -5686,6 +5695,9 @@ the Bookmarks menu.">
       <if expr="use_titlecase">
         <message name="IDS_TAB_CXMENU_NEWTAB" desc="In Title Case: The label of the 'New Tab' Tab context menu item.">
           New Tab
+        </message>
+        <message name="IDS_TAB_CXMENU_NEWINCOGNITOTAB" desc="In Title Case: The label of the 'New Incognito Tab' Tab context menu item.">
+          New Incognito Tab
         </message>
         <message name="IDS_TAB_CXMENU_RELOAD" desc="In Title Case: The label of the 'Reload' Tab context menu item.">
           Reload

@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#ifndef BUILD_INCOGNITO_TAB
+#define BUILD_INCOGNITO_TAB 1
+#endif
+
 #ifndef CHROME_BROWSER_UI_TABS_TAB_STRIP_MODEL_H_
 #define CHROME_BROWSER_UI_TABS_TAB_STRIP_MODEL_H_
 
@@ -342,6 +346,9 @@ class TabStripModel {
   enum ContextMenuCommand {
     CommandFirst,
     CommandNewTab,
+#if BUILD_INCOGNITO_TAB
+    CommandNewIncognitoTab,
+#endif
     CommandReload,
     CommandDuplicate,
     CommandCloseTab,
